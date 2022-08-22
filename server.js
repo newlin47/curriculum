@@ -1,6 +1,45 @@
 const express = require('express');
 const app = express();
+const morgan = require('morgan');
+const methodOverride = require('method-override');
+app.use(morgan('dev'));
+app.use(express.urlencoded({ extended: false }));
+app.use(methodOverride('_method'));
 const { conn, Author, Book, Publisher } = require('./db');
+
+app.use((req, res, next) => {
+	if (req.query.method) {
+		req.method = req.query.method;
+	}
+	next();
+});
+
+app.get('/api/authors', async (req, res, next) => {
+	try {
+		const authors = await Author.findAll({ include: [Book] });
+		res.send(authors);
+	} catch (error) {
+		next(error);
+	}
+});
+
+app.get('/api/books', async (req, res, next) => {
+	try {
+		const books = await Book.findAll({ include: [Author] });
+		res.send(books);
+	} catch (ex) {
+		next(ex);
+	}
+});
+
+app.get('/api/publishers', async (req, res, next) => {
+	try {
+		const publishers = await Publisher.findAll({ include: [Book] });
+		res.send(publishers);
+	} catch (ex) {
+		next(ex);
+	}
+});
 
 const init = async () => {
 	try {
@@ -54,7 +93,7 @@ const init = async () => {
 			},
 		];
 		await Promise.all(bookData.map((text) => Book.create(text)));
-		const port = process.env.PORT || 3000;
+		const port = process.env.PORT || 3001;
 		app.listen(port, () => console.log(`listening on port ${port}`));
 	} catch (ex) {
 		console.log(ex);
