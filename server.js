@@ -122,7 +122,8 @@ app.get('/api/publishers', async (req, res, next) => {
 				<ul>
 					${publishers
 						.map((publisher) => {
-							return `<li>${publisher.company_name}</li>`;
+							return `<li>${publisher.company_name}</li>
+							`;
 						})
 						.join('')}
 				</ul>
