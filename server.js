@@ -14,10 +14,60 @@ app.use((req, res, next) => {
 	next();
 });
 
+app.get('/', async (req, res, next) => {
+	try {
+		const authors = await Author.findAll();
+		res.send(`
+		<html>
+			<head>
+				<title>Curriculum</title>
+			</head>
+			<body>
+				<h1>Curriculum: Required Readings</h1>
+				<h4><a href="/">Return to home page</a></h4>
+				<div>
+					<h3><a href="/api/authors">Authors</a></h3>
+				</div>
+				<div>
+					<h3><a href="/api/books">Books</a></h3>
+				</div>
+				<div>
+					<h3><a href="/api/publishers">Publishers</a></h3>
+				</div>
+			</body>
+		</html>
+		`);
+	} catch (error) {
+		next(error);
+	}
+});
+
 app.get('/api/authors', async (req, res, next) => {
 	try {
 		const authors = await Author.findAll({ include: [Book] });
-		res.send(authors);
+		res.send(`
+		<html>
+			<head>
+				<title>Curriculum</title>
+			</head>
+			<body>
+				<h1>Curriculum: Required Readings</h1>
+				<h4><a href="/">Return to home page</a></h4>
+				<div>
+					<h3><a href="/api/authors">Authors</a></h3>
+				</div>
+				<div>
+				<ul>
+					${authors
+						.map((author) => {
+							return `<li>${author.name}</li>`;
+						})
+						.join('')}
+				</ul>
+			</div>
+			</body>
+		</html>
+		`);
 	} catch (error) {
 		next(error);
 	}
@@ -26,7 +76,29 @@ app.get('/api/authors', async (req, res, next) => {
 app.get('/api/books', async (req, res, next) => {
 	try {
 		const books = await Book.findAll({ include: [Author] });
-		res.send(books);
+		res.send(`
+		<html>
+			<head>
+				<title>Curriculum</title>
+			</head>
+			<body>
+				<h1>Curriculum: Required Readings</h1>
+				<h4><a href="/">Return to home page</a></h4>
+				<div>
+					<h3><a href="/api/books">Books</a></h3>
+				</div>
+				<div>
+				<ul>
+					${books
+						.map((book) => {
+							return `<li>${book.title} by ${book.author.name}</li>`;
+						})
+						.join('')}
+				</ul>
+			</div>
+			</body>
+		</html>
+		`);
 	} catch (ex) {
 		next(ex);
 	}
@@ -35,7 +107,29 @@ app.get('/api/books', async (req, res, next) => {
 app.get('/api/publishers', async (req, res, next) => {
 	try {
 		const publishers = await Publisher.findAll({ include: [Book] });
-		res.send(publishers);
+		res.send(`
+		<html>
+			<head>
+				<title>Curriculum</title>
+			</head>
+			<body>
+				<h1>Curriculum: Required Readings</h1>
+				<h4><a href="/">Return to home page</a></h4>
+				<div>
+					<h3><a href="/api/publishers">Publishers</a></h3>
+				</div>
+				<div>
+				<ul>
+					${publishers
+						.map((publisher) => {
+							return `<li>${publisher.company_name}</li>`;
+						})
+						.join('')}
+				</ul>
+			</div>
+			</body>
+		</html>
+		`);
 	} catch (ex) {
 		next(ex);
 	}
